@@ -16,13 +16,14 @@ using (StreamWriter writer = new StreamWriter(File.Create("Pomocy.cs")))
 	writer.Write(methodOffset + "int a = int.Parse(Console.ReadLine());\n");
 	writer.Write(methodOffset + "Console.WriteLine(\"Second number: \");\n");
 	writer.Write(methodOffset + "int b = int.Parse(Console.ReadLine());\n");
-	writer.Write(methodOffset + "Console.WriteLine(\"Do u wanna: a - Add, b - Subtract, c - Multiple\");\n");
-	writer.Write(methodOffset + "char method = Console.ReadKey().KeyChar\t\n");
+	writer.Write(methodOffset + "Console.WriteLine(\"Do u wanna: a - Add, b - Subtract, c - Multiple, d - Divide\");\n");
+	writer.Write(methodOffset + "char method = Console.ReadKey().KeyChar;\n");
 	writer.Write(methodOffset + "int result;\n");
 	writer.Write(methodOffset + $"if(method == 'a')\n{methodOffset}{{\n{methodOffset}\tresult = Add(a, b);\n{methodOffset}}}\n");
 	writer.Write(methodOffset + $"else if(method == 'b')\n{methodOffset}{{\n{methodOffset}\tresult = Subtract(a, b);\n{methodOffset}}}\n");
 	writer.Write(methodOffset + $"else if(method == 'c')\n{methodOffset}{{\n{methodOffset}\tresult = Multiple(a, b);\n{methodOffset}}}\n");
-	writer.Write(methodOffset + "Console.WriteLine(\"Output: \" + result);\n");
+	writer.Write(methodOffset + $"else if(method == 'd')\n{methodOffset}{{\n{methodOffset}\tresult = Divide(a, b);\n{methodOffset}}}\n");
+	writer.Write(methodOffset + "Console.WriteLine(\"\\nOutput: \" + result);\n");
 
 	//End method
 	writer.Write("\t}\n");
@@ -31,6 +32,7 @@ using (StreamWriter writer = new StreamWriter(File.Create("Pomocy.cs")))
 	Adding(writer);
 	Subtraction(writer);
 	Multiplication(writer);
+	Divide(writer);
 
 	//End class
 	writer.Write("}");
@@ -85,5 +87,21 @@ void Multiplication(StreamWriter writer)
 			writer.Write($"{methodOffset}else if(a == {a} && b == {b})\n{methodOffset}{{\n{methodOffset}\treturn {a * b};\n{methodOffset}}}\n");
 	}
 	writer.Write($"{methodOffset}throw new Exception(\"Calculator cannot calculate this numbers ;-;\")\n");
+	writer.Write("\t}\n");
+}
+
+void Divide(StreamWriter writer)
+{
+
+	writer.Write($"\n\tpublic static int Divide(int a, int b)\n\t{{\n");
+	writer.Write($"{methodOffset}if(a == 0 && b == 1)\n{methodOffset}{{\n{methodOffset}\treturn 0;\n{methodOffset}}}\n");
+
+	//Yandere dev would be proud
+	for (int a = 0; a <= iterations; a++)
+	{
+		for (int b = 1; b <= iterations; b++)
+			writer.Write($"{methodOffset}else if(a == {a} && b == {b})\n{methodOffset}{{\n{methodOffset}\treturn {a/b};\n{methodOffset}}}\n");
+	}
+	writer.Write($"{methodOffset}throw new Exception(\"Calculator cannot calculate this numbers ;-;\");\n");
 	writer.Write("\t}\n");
 }
