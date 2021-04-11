@@ -2,9 +2,13 @@
 using System.IO;
 
 const string methodOffset = "\t\t";
+const string fileName = "Program.cs";
+
+Console.WriteLine("How big number can be used (above 1000 will take more time to generate): ");
 int iterations = int.Parse(Console.ReadLine());
 
-using (StreamWriter writer = new StreamWriter(File.Create("Pomocy.cs")))
+Console.WriteLine("Creating file...");
+using (StreamWriter writer = new StreamWriter(File.Create(fileName)))
 {
 
 	writer.AutoFlush = true;
@@ -41,6 +45,7 @@ using (StreamWriter writer = new StreamWriter(File.Create("Pomocy.cs")))
 	writer.Close();
 }
 
+Console.WriteLine("File will appear in: " + Path.Combine(Directory.GetCurrentDirectory(),fileName));
 
 void Calc(StreamWriter writer, char type)
 {
