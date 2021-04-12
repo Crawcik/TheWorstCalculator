@@ -1,14 +1,18 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Collections.Generic;
 
 const string methodOffset = "\t\t";
 const string fileName = "Program.cs";
+string[] yesTypes = { "y", "yes", "" };
 
-Console.WriteLine("How big number can be used (above 1000 will take more time to generate): ");
+Console.Write("How big number can be used (above 1000 will take more time to generate): ");
 int iterations = int.Parse(Console.ReadLine());
+char[] operators = GetOperators();
 
-Console.WriteLine("Creating file...");
-using (StreamWriter writer = new StreamWriter(File.Create(fileName)))
+Console.Write("\n\nCreating file...");
+using (StreamWriter writer = new(File.Create(fileName)))
 {
 
 	writer.AutoFlush = true;
@@ -34,10 +38,8 @@ using (StreamWriter writer = new StreamWriter(File.Create(fileName)))
 	writer.Write("\t}\n");
 
 	//Meth
-	Calc(writer, 'a');
-	Calc(writer, 's');
-	Calc(writer, 'm');
-	Calc(writer, 'd');
+	foreach(char opt in operators)
+		Calc(writer, opt);
 
 	//End of class
 	writer.Write("}");
@@ -45,7 +47,7 @@ using (StreamWriter writer = new StreamWriter(File.Create(fileName)))
 	writer.Close();
 }
 
-Console.WriteLine("File will appear in: " + Path.Combine(Directory.GetCurrentDirectory(),fileName));
+Console.Write("\nFile will appear in: " + Path.Combine(Directory.GetCurrentDirectory(),fileName));
 
 void Calc(StreamWriter writer, char type)
 {
@@ -80,3 +82,26 @@ string GetName(char type) => type switch
 	'd' => "Divide",
 	_ => throw new ArgumentException("Wrong argument has been given")
 };
+
+char[] GetOperators()
+{
+	List<char> options = new();
+
+	if (CheckIf("Do you wanna include all math operations?"))
+		return new[] { 'a', 's', 'm', 'd' };
+	if (CheckIf("Do you wanna include ADDING?"))
+		options.Add('a');
+	if (CheckIf("Do you wanna include SUBTRACTION?"))
+		options.Add('s');
+	if (CheckIf("Do you wanna include MULTIPLYING?"))
+		options.Add('m');
+	if (CheckIf("Do you wanna include SUBTRACTION?"))
+		options.Add('d');
+	return options.ToArray();
+}
+
+bool CheckIf(string question)
+{
+	Console.Write("\n" + question + " [Y/n]: ");
+	return yesTypes.Contains(Console.ReadLine().ToLower());
+}
