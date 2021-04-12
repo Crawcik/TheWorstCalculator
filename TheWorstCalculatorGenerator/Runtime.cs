@@ -9,7 +9,7 @@ string[] yesTypes = { "y", "yes", "" };
 
 Console.Write("How big number can be used (above 1000 will take more time to generate): ");
 int iterations = int.Parse(Console.ReadLine());
-char[] operators = GetOperators();
+char[] operators = args.Length == 1 ? args[0].ToLower().ToCharArray() : GetOperators();
 
 Console.Write("\n\nCreating file...");
 using (StreamWriter writer = new(File.Create(fileName)))
