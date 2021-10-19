@@ -1,8 +1,50 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using Mono.TextTemplating;
 
+//Setting maximum number
+string[] yesTypes = { "y", "yes", "", "yup" };
+Console.Write("What will be the maximum number (1000 and above will take long time to generate): ");
+int iterations = int.Parse(Console.ReadLine());
+char[] operators = args.Length == 1 ? args[0].ToLower().ToCharArray() : GetOperators();
+
+foreach(string filename in Directory.GetFiles(Directory.GetCurrentDirectory()).Where(x=>x.EndsWith(".tt")))
+    CreateFile(filename);
+
+//Generating code
+void CreateFile(string filename)
+{
+    Console.Write("\n\nCreating file...");
+    TemplateGenerator templateGenerator = new();
+    templateGenerator.TryAddParameter("MaxCount=" + iterations);
+    templateGenerator.ProcessTemplate(filename, "test.cs");
+}
+
+char[] GetOperators()
+{
+	List<char> options = new();
+
+	if (CheckIf("Do you wanna include all math operations?"))
+		return new[] { 'a', 's', 'm', 'd' };
+	if (CheckIf("Do you wanna include ADDING?"))
+		options.Add('a');
+	if (CheckIf("Do you wanna include SUBTRACTION?"))
+		options.Add('s');
+	if (CheckIf("Do you wanna include MULTIPLYING?"))
+		options.Add('m');
+	if (CheckIf("Do you wanna include SUBTRACTION?"))
+		options.Add('d');
+	return options.ToArray();
+}
+
+bool CheckIf(string question)
+{
+	Console.Write("\n" + question + " [Y/n]: ");
+	return yesTypes.Contains(Console.ReadLine().ToLower());
+}
+/*
 const string methodOffset = "\t\t";
 const string fileName = "Program.cs";
 string[] yesTypes = { "y", "yes", "" };
@@ -82,26 +124,4 @@ string GetName(char type) => type switch
 	'd' => "Divide",
 	_ => throw new ArgumentException("Wrong argument has been given")
 };
-
-char[] GetOperators()
-{
-	List<char> options = new();
-
-	if (CheckIf("Do you wanna include all math operations?"))
-		return new[] { 'a', 's', 'm', 'd' };
-	if (CheckIf("Do you wanna include ADDING?"))
-		options.Add('a');
-	if (CheckIf("Do you wanna include SUBTRACTION?"))
-		options.Add('s');
-	if (CheckIf("Do you wanna include MULTIPLYING?"))
-		options.Add('m');
-	if (CheckIf("Do you wanna include SUBTRACTION?"))
-		options.Add('d');
-	return options.ToArray();
-}
-
-bool CheckIf(string question)
-{
-	Console.Write("\n" + question + " [Y/n]: ");
-	return yesTypes.Contains(Console.ReadLine().ToLower());
-}
+*/
