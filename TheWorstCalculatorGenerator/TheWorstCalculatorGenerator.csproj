@@ -6,6 +6,7 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Mono.Options" Version="6.12.0.148" />
     <PackageReference Include="Mono.TextTemplating" Version="2.2.1" />
   </ItemGroup>
 </Project>
