@@ -9,6 +9,7 @@ using Mono.Options;
 internal class Generator
 {
 	private static readonly string[] _yesTypes = { "y", "yes", "", "yup" };
+	private static readonly char[] _defaultOperators = { 'a', 's' };
 	private static Options _options = new Options
 	{
 		Operators = null,
@@ -21,6 +22,10 @@ internal class Generator
 	{
 		//Getting arguments
 		bool help = false;
+		bool autorun = true;
+		bool inputIsFile = true;
+		bool outputIsGenerated = false;
+
 		OptionSet optionSet = new()
 		{
 			{ "m|max=", "Sets the maximum number", (value) => _options.MaxNumber = int.Parse(value) },
@@ -51,29 +56,82 @@ internal class Generator
 		if (help)
 		{
 			Console.WriteLine("Usage: command [OPTIONS]");
-			foreach (var source in optionSet.ArgumentSources)
-				Console.WriteLine($" - {string.Join(',', source.GetNames())}\t{source.Description}");
+			foreach (var source in optionSet)
+				Console.WriteLine($" - {string.Join(", ", source.GetNames())}\t{source.Description}");
 			return;
         }
-
-		//Setting maximum number
-		if (_options.MaxNumber == 0)
+		
+		//Preparing options
+		if (_options.MaxNumber <= 0)
 		{
+			autorun = false;
 			Console.Write("What will be the maximum number (1000 and above will take long time to generate): ");
-			if(int.TryParse(Console.ReadLine(), out _options.MaxNumber))
-				Console.Write("What will be the maximum number (1000 and above will take long time to generate): ");
+			if(!int.TryParse(Console.ReadLine(), out _options.MaxNumber))
+			{
+				Console.Write("\nWrong or too big number!\n");
+				return;
+			}
 		}
-		_options.Operators ??= GetOperators();
+		
+		string path = _options.Input;
+
+		CheckFile:
+		if(File.Exists(path))
+		{
+			inputIsFile = true;
+		}
+		else if(Directory.Exists(path))
+		{
+			inputIsFile = false;
+		}
+		else if(_options.Input is not null)
+		{
+			Console.WriteLine("Wrong path to file or directory!");
+			return;
+		}
+		else
+		{
+			autorun = false;
+			Console.Write("\nPlease enter template file path (e.g. cs.tt - CSharp template): ");
+			path = Console.ReadLine();
+			goto CheckFile;
+
+		}
+
+		if(!autorun || _options.Output is null)
+		{
+			outputIsGenerated = true;
+			_options.Output = Directory.GetCurrentDirectory();
+		}
+
+		_options.Input = path;
+		_options.Operators ??= autorun ? _defaultOperators : GetOperators();
+
+		//Generating file/files
+		Console.Write("\nGenerating code...");
+		if(inputIsFile)
+		{
+			GenerateCode(_options.Input, _options.Output, outputIsGenerated);
+			return;
+		}
+
+		IEnumerable<string> files = Directory.GetFiles(_options.Output).Where(x=>x.EndsWith(".tt"));
+		foreach(string file in files)
+			GenerateCode(file, path, outputIsGenerated);
+
 	}
 
-	private static void CreateFile(string filename)
+	private static void GenerateCode(string input, string output, bool outputIsGenerated)
 	{
-		Console.Write("\n\nCreating file...");
+		if(outputIsGenerated)
+				_options.Output = Path.Combine(_options.Output, "calculator." + Path.GetFileNameWithoutExtension(_options.Input));
 		TemplateGenerator templateGenerator = new();
 		templateGenerator.TryAddParameter("MaxNumber=" + _options.MaxNumber);
 		templateGenerator.TryAddParameter("Operators=" + _options.Output);
-		//templateGenerator.ProcessTemplate(filename.);
-
+		Console.WriteLine((templateGenerator.ProcessTemplate(input, output) 
+		? "\n - Created: "
+		: "\n - Something went wrong creating: ")
+		+ Path.GetRelativePath(Directory.GetCurrentDirectory(), output));
 	}
 
 	private static char[] GetOperators()
@@ -98,103 +156,4 @@ internal class Generator
 		Console.Write("\n" + question + " [Y/n]: ");
 		return _yesTypes.Contains(Console.ReadLine().ToLower());
 	}
-
-	private static int GetNumber(char type, int a, int b) => type switch
-	{
-		'a' => a + b,
-		's' => a - b,
-		'm' => a * b,
-		'd' => b == 0 ? 0 : a / b,
-		_ => throw new ArgumentException("Wrong argument has been given")
-	};
-
-	private static string GetName(char type) => type switch
-	{
-		'a' => "Add",
-		's' => "Subtract",
-		'm' => "Multiple",
-		'd' => "Divide",
-		_ => throw new ArgumentException("Wrong argument has been given")
-	};
 }
-	/*
-	const string methodOffset = "\t\t";
-	const string fileName = "Program.cs";
-	string[] yesTypes = { "y", "yes", "" };
-
-	Console.Write("How big number can be used (above 1000 will take more time to generate): ");
-	int iterations = int.Parse(Console.ReadLine());
-	char[] operators = args.Length == 1 ? args[0].ToLower().ToCharArray() : GetOperators();
-
-	Console.Write("\n\nCreating file...");
-	using (StreamWriter writer = new(File.Create(fileName)))
-	{
-
-		writer.AutoFlush = true;
-		writer.Write("using System;\n\n");
-		//Start of class
-		writer.Write("public static class Calculator\n{\n");
-		//Main method
-		writer.Write("\tpublic static void Main(string[] args)\n\t{\n");
-		writer.Write(methodOffset + $"Console.WriteLine(\"Max number: {iterations.ToString()}\");\n");
-		writer.Write(methodOffset + "Console.WriteLine(\"First number: \");\n");
-		writer.Write(methodOffset + "int a = int.Parse(Console.ReadLine());\n");
-		writer.Write(methodOffset + "Console.WriteLine(\"Second number: \");\n");
-		writer.Write(methodOffset + "int b = int.Parse(Console.ReadLine());\n");
-		writer.Write(methodOffset + "Console.WriteLine(\"Do u wanna: a - Add, b - Subtract, c - Multiple, d - Divide\");\n");
-		writer.Write(methodOffset + "char method = Console.ReadKey().KeyChar;\n");
-		writer.Write(methodOffset + "int result = 69;\n"); //I wanna die
-		writer.Write(methodOffset + $"if(method == 'a')\n{methodOffset}{{\n{methodOffset}\tresult = Add(a, b);\n{methodOffset}}}\n");
-		writer.Write(methodOffset + $"else if(method == 'b')\n{methodOffset}{{\n{methodOffset}\tresult = Subtract(a, b);\n{methodOffset}}}\n");
-		writer.Write(methodOffset + $"else if(method == 'c')\n{methodOffset}{{\n{methodOffset}\tresult = Multiple(a, b);\n{methodOffset}}}\n");
-		writer.Write(methodOffset + $"else if(method == 'd')\n{methodOffset}{{\n{methodOffset}\tresult = Divide(a, b);\n{methodOffset}}}\n");
-		writer.Write(methodOffset + "Console.WriteLine(\"\\nOutput: \" + result);\n");
-		//End main method
-		writer.Write("\t}\n");
-
-		//Meth
-		foreach(char opt in operators)
-			Calc(writer, opt);
-
-		//End of class
-		writer.Write("}");
-		writer.Flush();
-		writer.Close();
-	}
-
-	Console.Write("\nFile will appear in: " + Path.Combine(Directory.GetCurrentDirectory(),fileName));
-
-	void Calc(StreamWriter writer, char type)
-	{
-
-		writer.Write($"\n\tpublic static int {GetName(type)}(int a, int b)\n\t{{\n");
-		writer.Write($"{methodOffset}if(a == 0 && b == 0)\n{methodOffset}{{\n{methodOffset}\treturn 0;\n{methodOffset}}}\n");
-
-		//Yandere dev would be proud
-		for (int a = 0; a <= iterations; a++)
-		{
-			for (int b = 0; b <= iterations; b++)
-				writer.Write($"{methodOffset}else if(a == {a} && b == {b})\n{methodOffset}{{\n{methodOffset}\treturn {GetNumber(type,a,b)};\n{methodOffset}}}\n");
-		}
-		writer.Write($"{methodOffset}throw new Exception(\"Calculator cannot calculate this numbers ;-;\");\n");
-		writer.Write("\t}\n");
-	}
-
-	int GetNumber(char type, int a, int b) => type switch
-	{
-		'a' => a + b,
-		's' => a - b,
-		'm' => a * b,
-		'd' => b == 0 ? 0 : a / b,
-		_ => throw new ArgumentException("Wrong argument has been given")
-	};
-
-	string GetName(char type) => type switch
-	{
-		'a' => "Add",
-		's' => "Subtract",
-		'm' => "Multiple",
-		'd' => "Divide",
-		_ => throw new ArgumentException("Wrong argument has been given")
-	};
-	*/
