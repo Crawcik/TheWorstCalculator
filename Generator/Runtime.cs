@@ -93,7 +93,7 @@ internal class Generator
 
 			if(path is null)
 			{
-				path = Path.Combine(Directory.GetCurrentDirectory(), "..", "Templates");
+				path = Path.Combine(Directory.GetCurrentDirectory(), "Templates");
 				if(Directory.Exists(path))
 				{
 					if(CheckIf("Do you wanna generate default templates?"))
@@ -147,7 +147,6 @@ internal class Generator
 	private static char[] GetOperators()
 	{
 		List<char> options = new();
-
 		if (CheckIf("Do you wanna include all math operations?"))
 			return new[] { 'a', 's', 'm', 'd' };
 		if (CheckIf("Do you wanna include ADDING?"))
