@@ -24,7 +24,6 @@ internal class Generator
 		bool help = false;
 		bool autorun = true;
 		bool inputIsFile = true;
-		bool outputIsGenerated = false;
 
 		OptionSet optionSet = new()
 		{
@@ -111,36 +110,38 @@ internal class Generator
 		_options.Operators ??= autorun ? _defaultOperators : GetOperators();
 
 		if(!autorun || _options.Output is null)
-		{
-			outputIsGenerated = true;
 			_options.Output = Directory.GetCurrentDirectory();
-		}
 
 		//Generating file/files
 		Console.Write("\nGenerating code...");
 		if(inputIsFile)
 		{
-			GenerateCode(_options.Input, _options.Output, outputIsGenerated);
+			GenerateCode(_options.Input, _options.Output);
 			return;
 		}
-
-		IEnumerable<string> files = Directory.GetFiles(_options.Output).Where(x=>x.EndsWith(".tt"));
+		IEnumerable<string> files = Directory.GetFiles(_options.Input).Where(x=>x.EndsWith(".tt"));
 		foreach(string file in files)
-			GenerateCode(file, _options.Output, outputIsGenerated);
+			GenerateCode(file, _options.Output);
 
 	}
 
-	private static void GenerateCode(string input, string output, bool outputIsGenerated)
+	private static void GenerateCode(string input, string output)
 	{
-		if(outputIsGenerated || Directory.Exists(output))
-			_options.Output = Path.Combine(output, "calculator." + Path.GetFileNameWithoutExtension(_options.Input));
+		if(Directory.Exists(output))
+			output = Path.Combine(output, "calculator." + Path.GetFileNameWithoutExtension(input) + ".txt");
 		TemplateGenerator templateGenerator = new();
 		templateGenerator.TryAddParameter("MaxNumber=" + _options.MaxNumber);
-		templateGenerator.TryAddParameter("Operators=" + _options.Output);
-		Console.WriteLine((templateGenerator.ProcessTemplate(input, output) 
-		? "\n - Created: "
-		: "\n - Something went wrong creating: ")
-		+ Path.GetRelativePath(Directory.GetCurrentDirectory(), output));
+		templateGenerator.TryAddParameter("Operators=" + new string(_options.Operators));
+		try
+		{
+			Console.WriteLine((templateGenerator.ProcessTemplate(input, output) 
+			? "\n - Created: "
+			: "\n - Something went wrong creating: ")
+			+ Path.GetRelativePath(Directory.GetCurrentDirectory(), output));
+		} catch (Exception e)
+		{
+			Console.WriteLine(e);
+		}
 	}
 
 	private static char[] GetOperators()
