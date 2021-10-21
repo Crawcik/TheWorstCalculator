@@ -91,21 +91,30 @@ internal class Generator
 		}
 		else
 		{
+
+			if(path is null)
+			{
+				path = Path.Combine(Directory.GetCurrentDirectory(), "..", "Templates");
+				if(Directory.Exists(path))
+				{
+					if(CheckIf("Do you wanna generate default templates?"))
+						goto CheckFile;
+				}
+			}
 			autorun = false;
 			Console.Write("\nPlease enter template file path (e.g. cs.tt - CSharp template): ");
 			path = Console.ReadLine();
 			goto CheckFile;
-
 		}
+
+		_options.Input = path;
+		_options.Operators ??= autorun ? _defaultOperators : GetOperators();
 
 		if(!autorun || _options.Output is null)
 		{
 			outputIsGenerated = true;
 			_options.Output = Directory.GetCurrentDirectory();
 		}
-
-		_options.Input = path;
-		_options.Operators ??= autorun ? _defaultOperators : GetOperators();
 
 		//Generating file/files
 		Console.Write("\nGenerating code...");
@@ -117,14 +126,14 @@ internal class Generator
 
 		IEnumerable<string> files = Directory.GetFiles(_options.Output).Where(x=>x.EndsWith(".tt"));
 		foreach(string file in files)
-			GenerateCode(file, path, outputIsGenerated);
+			GenerateCode(file, _options.Output, outputIsGenerated);
 
 	}
 
 	private static void GenerateCode(string input, string output, bool outputIsGenerated)
 	{
-		if(outputIsGenerated)
-				_options.Output = Path.Combine(_options.Output, "calculator." + Path.GetFileNameWithoutExtension(_options.Input));
+		if(outputIsGenerated || Directory.Exists(output))
+			_options.Output = Path.Combine(output, "calculator." + Path.GetFileNameWithoutExtension(_options.Input));
 		TemplateGenerator templateGenerator = new();
 		templateGenerator.TryAddParameter("MaxNumber=" + _options.MaxNumber);
 		templateGenerator.TryAddParameter("Operators=" + _options.Output);
