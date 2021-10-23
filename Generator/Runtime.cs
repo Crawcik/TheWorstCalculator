@@ -128,7 +128,7 @@ internal class Generator
 	private static void GenerateCode(string input, string output)
 	{
 		if(Directory.Exists(output))
-			output = Path.Combine(output, "calculator." + Path.GetFileNameWithoutExtension(input) + ".txt");
+			output = Path.Combine(output, "calculator.txt");
 		TemplateGenerator templateGenerator = new();
 		templateGenerator.TryAddParameter("MaxNumber=" + _options.MaxNumber);
 		templateGenerator.TryAddParameter("Operators=" + new string(_options.Operators));
@@ -155,7 +155,7 @@ internal class Generator
 			options.Add('s');
 		if (CheckIf("Do you wanna include MULTIPLYING?"))
 			options.Add('m');
-		if (CheckIf("Do you wanna include SUBTRACTION?"))
+		if (CheckIf("Do you wanna include DIVIDING?"))
 			options.Add('d');
 		return options.ToArray();
 	}
