@@ -1,0 +1,89 @@
+<#@ template hostspecific="true" language="C#" #>
+<#@ output extension=".cs" #>
+<#@ import namespace="System.Linq" #>
+<#@ parameter type="System.Int32" name="MaxNumber" #>
+<#@ parameter type="System.String" name="Operators" #>
+<#
+	string GetList() => string.Join(',', Operators.ToCharArray().Select(x=> $" {x} - {GetName(x)}"));
+
+	string GetName(char type) => type switch
+	{
+		'a' => "Add",
+		's' => "Subtract",
+		'm' => "Multiple",
+		'd' => "Divide",
+		_ => throw new ArgumentException("Wrong argument has been given")
+	};
+	
+	int GetNumber(char type, int a, int b) => type switch
+	{
+		'a' => a + b,
+		's' => a - b,
+		'm' => a * b,
+		'd' => b == 0 ? 0 : a / b,
+		_ => throw new ArgumentException("Wrong argument has been given")
+	};
+#>
+using System;
+
+public static class Calculator
+{
+	public static void Main(string[] args)
+	{
+		Console.WriteLine("Max number: <#= MaxNumber #>");
+		Console.WriteLine("First number: ");
+		int a = int.Parse(Console.ReadLine());
+		Console.WriteLine("Second number: ");
+		int b = int.Parse(Console.ReadLine());
+		Console.WriteLine("Do u wanna: <#= GetList() #>");
+		char method = Console.ReadKey().KeyChar;
+		int result = 69;
+		Console.WriteLine("First number: ");
+		<#
+			char[] keys = Operators.ToCharArray();
+			bool first = true;
+			foreach (char key in keys)
+			{
+				if(first)
+					this.WriteLine($"if(method == \'{key}\')");
+				else
+					this.WriteLine($"else if(method == \'{key}\')");
+				first = false;
+		#>
+		{
+			result = <#= GetName(key) #>(a, b);
+		}
+		<#
+			}
+		#>
+Console.WriteLine("\nOutput: " + result);
+	}
+
+<#
+			foreach(char key in keys)
+			{
+#>
+	public static void <#= GetName(key) #>(int a, int b)
+	{
+<#
+				for(int a = 0; a <= MaxNumber; a++)
+				{
+					for(int b = 0; b <= MaxNumber; b++)
+					{
+						if(a == 0 && b == 0)
+							this.WriteLine($"\t\tif(a == {a} && b == {b})");
+						else
+							this.WriteLine($"\t\telse if(a == {a} && b == {b})");
+#>
+		{
+			Console.WriteLine(<#= GetNumber(key, a, b) #>);
+		}
+<#
+					}
+				}
+#>
+	}
+<#
+			}
+#>
+}
