@@ -37,8 +37,7 @@ public static class Calculator
 		int b = int.Parse(Console.ReadLine());
 		Console.WriteLine("Do u wanna: <#= GetList() #>");
 		char method = Console.ReadKey().KeyChar;
-		int result = 69;
-		Console.WriteLine("First number: ");
+		Console.WriteLine("Result: ");
 		<#
 			char[] keys = Operators.ToCharArray();
 			bool first = true;
@@ -51,12 +50,15 @@ public static class Calculator
 				first = false;
 		#>
 		{
-			result = <#= GetName(key) #>(a, b);
+			<#= GetName(key) #>(a, b);
 		}
 		<#
 			}
 		#>
-Console.WriteLine("\nOutput: " + result);
+else
+		{
+			Console.WriteLine("Bad method selected!");
+		}
 	}
 
 <#
@@ -82,6 +84,10 @@ Console.WriteLine("\nOutput: " + result);
 					}
 				}
 #>
+		else
+		{
+			Console.WriteLine("Unsupported number given!");
+		}
 	}
 <#
 			}
