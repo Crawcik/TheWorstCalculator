@@ -1,6 +1,6 @@
 /*
 
-Leave, before it's to late
+Leave, before it's too late
 It's you're last chance...
 
 
@@ -37,23 +37,25 @@ public static class Calculator
 	public static void Main(string[] args)
 	{
 		Console.WriteLine("Max number: 50");
-		Console.WriteLine("First number: ");
+		Console.Write("First number: ");
 		int a = int.Parse(Console.ReadLine());
-		Console.WriteLine("Second number: ");
+		Console.Write("Second number: ");
 		int b = int.Parse(Console.ReadLine());
-		Console.WriteLine("Do u wanna:  a - Add, s - Subtract");
+		Console.WriteLine("Do u wanna: a - Add, s - Subtract");
 		char method = Console.ReadKey().KeyChar;
-		int result = 69;
-		Console.WriteLine("First number: ");
+		Console.Write("\nResult: ");
 		if(method == 'a')
 		{
-			result = Add(a, b);
+			Add(a, b);
 		}
 		else if(method == 's')
 		{
-			result = Subtract(a, b);
+			Subtract(a, b);
 		}
-		Console.WriteLine("\nOutput: " + result);
+		else
+		{
+			Console.WriteLine("Bad method selected!");
+		}
 	}
 
 	public static void Add(int a, int b)
@@ -10462,6 +10464,10 @@ public static class Calculator
 		{
 			Console.WriteLine(100);
 		}
+		else
+		{
+			Console.WriteLine("Unsupported number given!");
+		}
 	}
 	public static void Subtract(int a, int b)
 	{
@@ -20868,6 +20874,10 @@ public static class Calculator
 		else if(a == 50 && b == 50)
 		{
 			Console.WriteLine(0);
+		}
+		else
+		{
+			Console.WriteLine("Unsupported number given!");
 		}
 	}
 }
