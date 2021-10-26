@@ -31,13 +31,13 @@ public static class Calculator
 	public static void Main(string[] args)
 	{
 		Console.WriteLine("Max number: <#= MaxNumber #>");
-		Console.WriteLine("First number: ");
+		Console.Write("First number: ");
 		int a = int.Parse(Console.ReadLine());
-		Console.WriteLine("Second number: ");
+		Console.Write("Second number: ");
 		int b = int.Parse(Console.ReadLine());
-		Console.WriteLine("Do u wanna: <#= GetList() #>");
+		Console.WriteLine("Do u wanna:<#= GetList() #>");
 		char method = Console.ReadKey().KeyChar;
-		Console.WriteLine("Result: ");
+		Console.Write("\nResult: ");
 		<#
 			char[] keys = Operators.ToCharArray();
 			bool first = true;
