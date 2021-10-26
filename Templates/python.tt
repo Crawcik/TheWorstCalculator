@@ -1,0 +1,75 @@
+<#@ template hostspecific="true" language="C#" #>
+<#@ output extension=".py" #>
+<#@ import namespace="System.Linq" #>
+<#@ parameter type="System.Int32" name="MaxNumber" #>
+<#@ parameter type="System.String" name="Operators" #>
+<#
+	string GetList() => string.Join(',', Operators.ToCharArray().Select(x=> $" {x} - {GetName(x)}"));
+
+	string GetName(char type) => type switch
+	{
+		'a' => "Add",
+		's' => "Subtract",
+		'm' => "Multiple",
+		'd' => "Divide",
+		_ => throw new ArgumentException("Wrong argument has been given")
+	};
+	
+	int GetNumber(char type, int a, int b) => type switch
+	{
+		'a' => a + b,
+		's' => a - b,
+		'm' => a * b,
+		'd' => b == 0 ? 0 : a / b,
+		_ => throw new ArgumentException("Wrong argument has been given")
+	};
+#>
+<#
+	char[] keys = Operators.ToCharArray();
+	foreach(char key in keys)
+	{
+#>
+def <#= GetName(key).ToLower() #>(a, b):
+<#
+		for(int a = 0; a <= MaxNumber; a++)
+		{
+			for(int b = 0; b <= MaxNumber; b++)
+			{
+				if(a == 0 && b == 0)
+					this.WriteLine($"\tif a == {a} and b == {b}:");
+				else
+					this.WriteLine($"\telif a == {a} and b == {b}:");
+#>
+		print(<#= GetNumber(key, a, b) #>)
+<#
+			}
+		}
+#>
+	else:
+		print("Unsupported number given!")
+<#
+	}
+#>
+		
+print("Max number: <#= MaxNumber #>")
+a = int(input("First number: "))
+b = int(input("Second number: "))
+print("Do u wanna:<#= GetList() #>")
+method = input().lower()[0]
+print("Result: ", end='')
+<#
+	bool first = true;
+	foreach (char key in keys)
+	{
+		if(first)
+			this.WriteLine($"if method == \'{key}\':");
+		else
+			this.WriteLine($"elif method == \'{key}\':");
+		first = false;
+#>
+	<#= GetName(key).ToLower() #>(a, b);
+<#
+	}
+#>
+else:
+	print("Bad method selected!")
