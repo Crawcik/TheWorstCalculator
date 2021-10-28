@@ -47,10 +47,10 @@ def <#= GetName(key).ToLower() #>(a, b):
 #>
 	else:
 		print("Unsupported number given!")
+	
 <#
 	}
-#>
-		
+#>	
 print("Max number: <#= MaxNumber #>")
 a = int(input("First number: "))
 b = int(input("Second number: "))
