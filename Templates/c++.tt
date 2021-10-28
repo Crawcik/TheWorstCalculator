@@ -1,0 +1,96 @@
+<#@ template hostspecific="true" language="C#" #>
+<#@ output extension=".cpp" #>
+<#@ import namespace="System.Linq" #>
+<#@ parameter type="System.Int32" name="MaxNumber" #>
+<#@ parameter type="System.String" name="Operators" #>
+<#
+	string GetList() => string.Join(',', Operators.ToCharArray().Select(x=> $" {x} - {GetName(x)}"));
+
+	string GetName(char type) => type switch
+	{
+		'a' => "Add",
+		's' => "Subtract",
+		'm' => "Multiple",
+		'd' => "Divide",
+		_ => throw new ArgumentException("Wrong argument has been given")
+	};
+	
+	int GetNumber(char type, int a, int b) => type switch
+	{
+		'a' => a + b,
+		's' => a - b,
+		'm' => a * b,
+		'd' => b == 0 ? 0 : a / b,
+		_ => throw new ArgumentException("Wrong argument has been given")
+	};
+#>
+#include<iostream>
+
+using namespace std;
+
+<#
+	char[] keys = Operators.ToCharArray();
+	foreach(char key in keys)
+	{
+#>
+void <#= GetName(key).ToLower() #>(int a, int b)
+{
+<#
+		for(int a = 0; a <= MaxNumber; a++)
+		{
+			for(int b = 0; b <= MaxNumber; b++)
+			{
+				if(a == 0 && b == 0)
+					this.WriteLine($"\tif (a == {a} && b == {b})");
+				else
+					this.WriteLine($"\telse if (a == {a} && b == {b})");
+#>
+	{
+		cout << <#= GetNumber(key, a, b) #>;
+	}
+<#
+			}
+		}
+#>
+	else
+	{
+		cout << "Unsupported number given!"";
+	}
+}
+
+<#
+	}
+#>
+int main()
+{
+	int a, b;
+	char method = '\0';
+	cout << "Max number: <#= MaxNumber #>" << endl;
+	cout << "First number: ";
+	cin >> a;
+	cout << "Second number: ";
+	cin >> b;
+	cout << "Do u wanna:<#= GetList() #>" << endl;
+	cin >> method;
+	cout << "Result: ";
+<#
+	bool first = true;
+	foreach (char key in keys)
+	{
+		if(first)
+			this.WriteLine($"\tif (method == \'{key}\')");
+		else
+			this.WriteLine($"\telse if (method == \'{key}\')");
+		first = false;
+#>
+	{
+		<#= GetName(key).ToLower() #>(a, b);
+	}
+<#
+	}
+#>
+	else
+	{
+		cout << "Bad method selected!";
+	}
+}
