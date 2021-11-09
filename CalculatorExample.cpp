@@ -10410,7 +10410,7 @@ void add(int a, int b)
 	}
 	else
 	{
-		cout << "Unsupported number given!"";
+		cout << "Unsupported number given!";
 	}
 }
 
@@ -20822,7 +20822,7 @@ void subtract(int a, int b)
 	}
 	else
 	{
-		cout << "Unsupported number given!"";
+		cout << "Unsupported number given!";
 	}
 }
 

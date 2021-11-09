@@ -54,7 +54,7 @@ void <#= GetName(key).ToLower() #>(int a, int b)
 #>
 	else
 	{
-		cout << "Unsupported number given!"";
+		cout << "Unsupported number given!";
 	}
 }
 
