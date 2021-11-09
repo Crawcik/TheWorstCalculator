@@ -1,0 +1,85 @@
+<#@ template hostspecific="true" language="C#" #>
+<#@ output extension=".pl" #>
+<#@ import namespace="System.Linq" #>
+<#@ parameter type="System.Int32" name="MaxNumber" #>
+<#@ parameter type="System.String" name="Operators" #>
+<#
+	string GetList() => string.Join(',', Operators.ToCharArray().Select(x=> $" {x} - {GetName(x)}"));
+
+	string GetName(char type) => type switch
+	{
+		'a' => "Add",
+		's' => "Subtract",
+		'm' => "Multiple",
+		'd' => "Divide",
+		_ => throw new ArgumentException("Wrong argument has been given")
+	};
+
+	int GetNumber(char type, int a, int b) => type switch
+	{
+		'a' => a + b,
+		's' => a - b,
+		'm' => a * b,
+		'd' => b == 0 ? 0 : a / b,
+		_ => throw new ArgumentException("Wrong argument has been given")
+	};
+#>
+#!/usr/bin/perl
+#
+print "Max number: <#= MaxNumber #>\n";
+print "First number: ";
+chomp(my $a = <>);
+print "Second number: ";
+chomp(my $b = <>);
+print "Do u wanna:<#= GetList() #>\n";
+my $method = <>;
+$method = substr($method, 0, 1);
+print "\nResult: ";
+<#
+	char[] keys = Operators.ToCharArray();
+	bool first = true;
+	foreach(char key in keys)
+	{
+		if(first)
+			this.WriteLine($"if ($method eq \'{key}\') " + "{");
+		else
+			this.WriteLine("}" + $" elsif ($method eq\'{key}\') " + "{");
+		first = false;
+#>
+	<#= GetName(key).ToLower() #>($a, $b);
+<#
+	}
+#>
+} else {
+	print "Bad method selected!";
+}
+
+<#
+	foreach(char key in keys)
+	{
+#>
+sub <#= GetName(key).ToLower() #> {
+	my $a = shift;
+	my $b = shift;
+<#
+		for(int a = 0; a <= MaxNumber; a++)
+		{
+			for(int b = 0; b <= MaxNumber; b++)
+			{
+				if(a == 0 && b == 0)
+					this.WriteLine($"\tif ($a eq {a} && $b eq {b}) " + "{");
+				else
+					this.WriteLine("\t}" + $" elsif ($a eq {a} && $b eq {b}) " + "{");
+#>
+		print <#= GetNumber(key, a, b) #>;
+<#
+			}
+		}
+#>
+	} else {
+		print "Unsupported number given!";
+	}
+}
+<#
+	}
+#>
