@@ -1,0 +1,81 @@
+<#@ template hostspecific="true" language="C#" #>
+<#@ output extension=".js" #>
+<#@ import namespace="System.Linq" #>
+<#@ parameter type="System.Int32" name="MaxNumber" #>
+<#@ parameter type="System.String" name="Operators" #>
+<#
+	string GetList() => string.Join(',', Operators.ToCharArray().Select(x=> $" {x} - {GetName(x)}"));
+
+	string GetName(char type) => type switch
+	{
+		'a' => "Add",
+		's' => "Subtract",
+		'm' => "Multiple",
+		'd' => "Divide",
+		_ => throw new ArgumentException("Wrong argument has been given")
+	};
+	
+	int GetNumber(char type, int a, int b) => type switch
+	{
+		'a' => a + b,
+		's' => a - b,
+		'm' => a * b,
+		'd' => b == 0 ? 0 : a / b,
+		_ => throw new ArgumentException("Wrong argument has been given")
+	};
+#>
+
+alert("Max number: <#= MaxNumber #>");
+var a = prompt("First number:");
+var b = prompt("Second number:");
+var method = prompt("Do u wanna:<#= GetList() #>");
+var result = "Result: ";
+
+<#
+	char[] keys = Operators.ToCharArray();
+	bool first = true;
+	foreach (char key in keys)
+	{
+		if(first)
+			this.WriteLine($"if (method == \'{key}\') " + "{");
+		else
+			this.WriteLine("}" + $"else if (method == \'{key}\')" + "{");
+		first = false;
+#>
+	result += <#= GetName(key).ToLower() #>(a, b);
+<#
+	}
+#>
+} else {
+	result += "Bad method selected!";
+}
+alert(result);
+
+<#
+	foreach(char key in keys)
+	{
+#>
+function <#= GetName(key).ToLower() #>(a, b) {
+<#
+		for(int a = 0; a <= MaxNumber; a++)
+		{
+			for(int b = 0; b <= MaxNumber; b++)
+			{
+				if(a == 0 && b == 0)
+					this.WriteLine($"\tif (a == {a} && b == {b}) " + "{");
+				else
+					this.WriteLine("\t}" + $"else if (a == {a} && b == {b})" + "{");
+#>
+		return <#= GetNumber(key, a, b) #>;
+<#
+			}
+		}
+#>
+	} else {
+		return "Unsupported number given!";
+	}
+}
+
+<#
+	}
+#>
