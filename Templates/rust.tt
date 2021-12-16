@@ -68,8 +68,6 @@ fn main() {
 #>
 
 fn <#= GetName(key).ToLower() #>(a: u32, b: u32) {
-	my $a = shift;
-	my $b = shift;
 <#
 		for(int a = 0; a <= MaxNumber; a++)
 		{
@@ -80,7 +78,7 @@ fn <#= GetName(key).ToLower() #>(a: u32, b: u32) {
 				else
 					this.WriteLine("\t}" + $" else if a == {a} && b == {b} " + "{");
 #>
-		print <#= GetNumber(key, a, b) #>;
+		print!("<#= GetNumber(key, a, b) #>");
 <#
 			}
 		}
