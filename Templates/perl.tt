@@ -53,11 +53,11 @@ print "\nResult: ";
 } else {
 	print "Bad method selected!";
 }
-
 <#
 	foreach(char key in keys)
 	{
 #>
+
 sub <#= GetName(key).ToLower() #> {
 	my $a = shift;
 	my $b = shift;
