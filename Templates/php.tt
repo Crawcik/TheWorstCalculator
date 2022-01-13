@@ -26,9 +26,9 @@
 #>
 <?php
 
-if (isset($_GET['c'][0]))
+if (isset($_GET['method'][0]))
 {
-	$method = $_GET['c'][0];
+	$method = $_GET['method'][0];
 }
 else
 {
@@ -44,6 +44,7 @@ if (isset($_GET['a']) && isset($_GET['b']))
 	echo "Second number: $b<br>";
 	echo "Result: ";
 <#
+	char[] keys = Operators.ToCharArray();
 	bool first = true;
 	foreach (char key in keys)
 	{
@@ -70,7 +71,6 @@ else
 }
 
 <#
-	char[] keys = Operators.ToCharArray();
 	foreach(char key in keys)
 	{
 #>
@@ -85,7 +85,7 @@ function <#= GetName(key).ToLower() #>($a, $b)
 				if(a == 0 && b == 0)
 					this.WriteLine($"\tif ($a == {a} && $b == {b})");
 				else
-					this.WriteLine($"\telse if (a == {a} && b == {b})");
+					this.WriteLine($"\telse if ($a == {a} && $b == {b})");
 #>
 	{
 		echo <#= GetNumber(key, a, b) #>;
