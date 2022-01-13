@@ -1,0 +1,88 @@
+<#@ template hostspecific="true" language="C#" #>
+<#@ output extension=".java" #>
+<#@ import namespace="System.Linq" #>
+<#@ parameter type="System.Int32" name="MaxNumber" #>
+<#@ parameter type="System.String" name="Operators" #>
+<#
+	string GetList() => string.Join(',', Operators.ToCharArray().Select(x=> $" {x} - {GetName(x)}"));
+
+	string GetName(char type) => type switch
+	{
+		'a' => "Add",
+		's' => "Subtract",
+		'm' => "Multiple",
+		'd' => "Divide",
+		_ => throw new ArgumentException("Wrong argument has been given")
+	};
+	
+	int GetNumber(char type, int a, int b) => type switch
+	{
+		'a' => a + b,
+		's' => a - b,
+		'm' => a * b,
+		'd' => b == 0 ? 0 : a / b,
+		_ => throw new ArgumentException("Wrong argument has been given")
+	};
+#>
+import java.util.Scanner;
+
+public class CalculatorExample
+{
+	public static void main(String[] args) {
+		Scanner input = new Scanner(System.in);
+		System.out.println("Max number: <#= MaxNumber #>");
+		System.out.print("First number: ");
+		int a = input.nextInt();
+		System.out.print("Second number: ");
+		int b = input.nextInt();
+		System.out.println("Do u wanna:<#= GetList() #>");
+		char method = input.next().charAt(0);
+		System.out.print("Result: ");
+<#
+	char[] keys = Operators.ToCharArray();
+	bool first = true;
+	foreach (char key in keys)
+	{
+		if(first)
+			this.WriteLine($"\t\tif (method == \'{key}\') " + "{");
+		else
+			this.WriteLine("\t\t} " + $"else if (method == \'{key}\') " + "{");
+		first = false;
+#>
+			<#= GetName(key).ToLower() #>(a, b);
+<#
+	}
+#>
+		} else {
+			System.out.println("Bad method selected!");
+		}
+	}
+<#
+	foreach(char key in keys)
+	{
+#>
+
+	public static void <#= GetName(key).ToLower() #>(int a, int b) {
+<#
+		for(int a = 0; a <= MaxNumber; a++)
+		{
+			for(int b = 0; b <= MaxNumber; b++)
+			{
+				if(a == 0 && b == 0)
+					this.WriteLine($"\t\tif (a == {a} && b == {b}) " + "{");
+				else
+					this.WriteLine("\t\t} " + $"else if (a == {a} && b == {b}) " + "{");
+#>
+			System.out.println(<#= GetNumber(key, a, b) #>);
+<#
+			}
+		}
+#>
+		} else {
+			System.out.println("Unsupported number given!");
+		}
+	}
+<#
+	}
+#>
+}
