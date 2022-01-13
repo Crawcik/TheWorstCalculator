@@ -1,0 +1,105 @@
+<#@ template hostspecific="true" language="C#" #>
+<#@ output extension=".php" #>
+<#@ import namespace="System.Linq" #>
+<#@ parameter type="System.Int32" name="MaxNumber" #>
+<#@ parameter type="System.String" name="Operators" #>
+<#
+	string GetList() => string.Join(',', Operators.ToCharArray().Select(x=> $" {x} - {GetName(x)}"));
+
+	string GetName(char type) => type switch
+	{
+		'a' => "Add",
+		's' => "Subtract",
+		'm' => "Multiple",
+		'd' => "Divide",
+		_ => throw new ArgumentException("Wrong argument has been given")
+	};
+	
+	int GetNumber(char type, int a, int b) => type switch
+	{
+		'a' => a + b,
+		's' => a - b,
+		'm' => a * b,
+		'd' => b == 0 ? 0 : a / b,
+		_ => throw new ArgumentException("Wrong argument has been given")
+	};
+#>
+<?php
+
+if (isset($_GET['c'][0]))
+{
+	$method = $_GET['c'][0];
+}
+else
+{
+	$method = 'a';
+}
+
+if (isset($_GET['a']) && isset($_GET['b'])) 
+{
+	echo "Max number: <#= MaxNumber #><br>";
+	$a = $_GET['a'];
+	$b = $_GET['b'];
+	echo "First number: $a<br>";
+	echo "Second number: $b<br>";
+	echo "Result: ";
+<#
+	bool first = true;
+	foreach (char key in keys)
+	{
+		if(first)
+			this.WriteLine($"\tif ($method == \'{key}\')");
+		else
+			this.WriteLine($"\telse if ($method == \'{key}\')");
+		first = false;
+#>
+	{
+		<#= GetName(key).ToLower() #>($a, $b);
+	}
+<#
+	}
+#>
+	else
+	{
+		echo "Bad method selected!";
+	}
+} 
+else
+{
+	echo "Parameter a and/or b is not set!<br>Example: calculator.php?a=2&b=3&method=add";
+}
+
+<#
+	char[] keys = Operators.ToCharArray();
+	foreach(char key in keys)
+	{
+#>
+
+function <#= GetName(key).ToLower() #>($a, $b)
+{
+<#
+		for(int a = 0; a <= MaxNumber; a++)
+		{
+			for(int b = 0; b <= MaxNumber; b++)
+			{
+				if(a == 0 && b == 0)
+					this.WriteLine($"\tif ($a == {a} && $b == {b})");
+				else
+					this.WriteLine($"\telse if (a == {a} && b == {b})");
+#>
+	{
+		echo <#= GetNumber(key, a, b) #>;
+	}
+<#
+			}
+		}
+#>
+	else
+	{
+		echo "Unsupported number given!";
+	}
+}
+<#
+	}
+#>
+?>
